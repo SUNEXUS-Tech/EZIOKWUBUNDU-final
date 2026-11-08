@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --navy: #4A0E1F;
+    --navy-dark: #350A16;
+    --navy-light: #5f1529;
+    --gold: #C9A24B;
+    --gold-light: #E0BE6C;
+    --gold-pale: #F6EDD7;
+    --gold-dark: #A37E31;
+    --ivory: #FAF6EC;
+    --champ: #EFE4C8;
+    --champ-dark: #E4D5B3;
+    --ink: #2B2B2B;
+    --muted-wine: #3B0A18;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 76px;
+    background-color: var(--ivory);
+    color: var(--ink);
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--ivory);
+    color: var(--ink);
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Poppins', 'Cinzel', serif;
+  }
+
+  .font-cinzel {
+    font-family: 'Cinzel', 'Poppins', serif;
+  }
+
+  .font-quote {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #F8F1DE 0%, #D8B25C 35%, #F0D58C 60%, #A57E2F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #C9A24B 0%, #E2C274 50%, #B8923E 100%);
+}
+
+.gold-glow {
+  box-shadow: 0 0 30px -5px rgba(201, 162, 75, 0.3);
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s ease-in-out infinite;
+}
+
+/* Subtle geometric pattern for "The Man" section - Interlocking Regal Lattice & Royal Insignia */
+.bg-pattern-man {
+  background-color: #FAF6EC;
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(201, 162, 75, 0.08) 0%, transparent 70%),
+    radial-gradient(circle at 90% 70%, rgba(74, 14, 31, 0.04) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23C9A24B' stroke-width='0.8' stroke-opacity='0.22'%3E%3Cpath d='M30 0 L60 30 L30 60 L0 30 Z'/%3E%3Cpath d='M0 0 L60 60M60 0 L0 60' stroke-opacity='0.1'/%3E%3Ccircle cx='30' cy='30' r='4' stroke='%234A0E1F' stroke-width='0.8' stroke-opacity='0.22'/%3E%3Ccircle cx='30' cy='30' r='1.5' fill='%23C9A24B' fill-opacity='0.35'/%3E%3Ccircle cx='0' cy='0' r='2' fill='%23C9A24B' fill-opacity='0.2'/%3E%3Ccircle cx='60' cy='0' r='2' fill='%23C9A24B' fill-opacity='0.2'/%3E%3Ccircle cx='0' cy='60' r='2' fill='%23C9A24B' fill-opacity='0.2'/%3E%3Ccircle cx='60' cy='60' r='2' fill='%23C9A24B' fill-opacity='0.2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-size: auto, auto, 60px 60px;
+}
+
+/* Subtle geometric pattern for "The Legacy" section - Interlocking Heritage Diamonds & Concentric Stitches */
+.bg-pattern-legacy {
+  background-color: #FAF6EC;
+  background-image: 
+    radial-gradient(ellipse at 50% 100%, rgba(201, 162, 75, 0.08) 0%, transparent 65%),
+    radial-gradient(circle at 10% 30%, rgba(74, 14, 31, 0.04) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg width='52' height='52' viewBox='0 0 52 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23C9A24B' stroke-width='0.8' stroke-opacity='0.22'%3E%3Cpath d='M26 0 L52 26 L26 52 L0 26 Z'/%3E%3Cpath d='M26 8 L44 26 L26 44 L8 26 Z' stroke='%234A0E1F' stroke-width='0.7' stroke-opacity='0.18' stroke-dasharray='3,3'/%3E%3Ccircle cx='26' cy='26' r='2.2' fill='%23C9A24B' fill-opacity='0.35'/%3E%3Cpath d='M0 0 L52 52M52 0 L0 52' stroke-opacity='0.09'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-size: auto, auto, 52px 52px;
+}
+
+@media print {
+  nav, footer, .no-print, button, .interactive-controls {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+}

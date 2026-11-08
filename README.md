@@ -1,11 +1,38 @@
-<div align="center">
+# The Triumph of Eziokwubundu I
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+A frontend-only React experience for the thanksgiving celebration of Jude Ifeanyi Anwukah (Eziokwubundu I).
 
-  <h1>Built with AI Studio</h2>
+## Stack
+- React 19 and TypeScript
+- Vite 8
+- Tailwind CSS 4
+- Lucide React
+- jsPDF for the downloadable keepsake
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+There is no application server or backend in this repository. The guestbook uses browser `localStorage`, so entries are saved only in the visitor's current browser and are not shared between visitors or devices.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Project structure
+```text
+src/
+  app/                 Application composition and page shell
+  components/          Page sections and interactive UI
+  data/                Event details, gallery entries and sample tributes
+  lib/                 Browser-side audio and PDF utilities
+  styles/              Global Tailwind and site styles
+  types.ts             Shared TypeScript interfaces
+  main.tsx             Browser entry point
+public/
+  images/              Production photographs served at /images/*
+index.html              Vite document entry point
+vite.config.ts          Vite, React and Tailwind configuration
+```
 
-</div>
+## Commands
+- `npm install` or `bun install` — install dependencies
+- `npm run dev` or `bun run dev` — start the development server
+- `npm run typecheck` or `bun run typecheck` — TypeScript check
+- `npm run build` or `bun run build` — production build
+- `npm run preview` or `bun run preview` — preview the production build
+- `npm run clean` or `bun run clean` — remove generated build output
+
+Static images in `public/images/` are referenced by root-relative paths such as `/images/hero.webp`, following Vite's public-directory convention.
