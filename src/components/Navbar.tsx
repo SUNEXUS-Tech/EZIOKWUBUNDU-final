@@ -4,7 +4,6 @@ import { officialAudio, AudioState } from '../lib/audioPlayer';
 
 export const Navbar: React.FC = () => {
   const [audioState, setAudioState] = useState<AudioState>(() => officialAudio.getState());
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
@@ -160,77 +159,34 @@ export const Navbar: React.FC = () => {
             )}
 
             {/* 2. Circular Music Play/Pause Control */}
-            <div className="relative">
-              <button
-                onClick={handleToggleMusic}
-                onMouseEnter={() => setShowVolumeSlider(true)}
-                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#C9A24B]/50 ${
-                  audioState.isPlaying
-                    ? 'border border-[#C9A24B] bg-[#C9A24B]/25 text-[#FAF6EC] shadow-sm shadow-[#C9A24B]/30 ring-2 ring-[#C9A24B]/40'
-                    : audioState.autoplayBlocked
-                    ? 'border border-[#C9A24B] bg-[#300B18] text-[#C9A24B] hover:bg-[#C9A24B]/20 ring-2 ring-[#C9A24B]/60 animate-pulse'
-                    : 'border border-[#C9A24B]/50 hover:border-[#C9A24B] bg-[#300B18] text-[#C9A24B] hover:text-[#FAF6EC] hover:bg-[#C9A24B]/15'
-                }`}
-                title={
-                  audioState.isPlaying
-                    ? 'Pause Official Thanksgiving Song'
-                    : 'Play Official Thanksgiving Song: The Triumph of Eziokwubundu I'
-                }
-                aria-label={
-                  audioState.isPlaying
-                    ? 'Pause Official Thanksgiving Song'
-                    : 'Play Official Thanksgiving Song'
-                }
-              >
-                {audioState.isLoading ? (
-                  <Loader2 size={15} className="animate-spin text-[#C9A24B]" />
-                ) : audioState.isPlaying ? (
-                  <Pause size={15} className="fill-[#C9A24B] text-[#C9A24B]" />
-                ) : (
-                  <Play size={15} className="fill-[#C9A24B] text-[#C9A24B] ml-0.5" />
-                )}
-              </button>
-
-              {/* Volume Slider Popover on hover (desktop) */}
-              {showVolumeSlider && (
-                <div
-                  onMouseEnter={() => setShowVolumeSlider(true)}
-                  onMouseLeave={() => setShowVolumeSlider(false)}
-                  className="absolute right-0 top-full mt-2 p-3 bg-[#240611] border border-[#C9A24B]/40 rounded-xl shadow-2xl flex flex-col gap-2 z-50 min-w-[170px] backdrop-blur-md"
-                >
-                  <div className="flex items-center justify-between text-[10px] text-[#C9A24B] tracking-wider uppercase font-semibold">
-                    <span>Thanksgiving Song</span>
-                    <span className="font-mono text-[#FAF6EC]/80">
-                      {audioState.isMuted ? 'Muted' : `${Math.round(audioState.volume * 100)}%`}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={handleToggleMute}
-                      className="text-[#C9A24B] hover:text-[#FAF6EC] transition-colors p-0.5"
-                      aria-label={audioState.volume === 0 || audioState.isMuted ? 'Unmute' : 'Mute'}
-                      title={audioState.volume === 0 || audioState.isMuted ? 'Unmute' : 'Mute'}
-                    >
-                      {audioState.volume === 0 || audioState.isMuted ? (
-                        <VolumeX size={15} />
-                      ) : (
-                        <Volume2 size={15} />
-                      )}
-                    </button>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.05"
-                      value={audioState.volume}
-                      onChange={handleVolumeChange}
-                      className="w-24 accent-[#C9A24B] h-1.5 cursor-pointer bg-[#300B18] rounded"
-                      aria-label="Official Thanksgiving Song volume"
-                    />
-                  </div>
-                </div>
+            <button
+              onClick={handleToggleMusic}
+              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#C9A24B]/50 ${
+                audioState.isPlaying
+                  ? 'border border-[#C9A24B] bg-[#C9A24B]/25 text-[#FAF6EC] shadow-sm shadow-[#C9A24B]/30 ring-2 ring-[#C9A24B]/40'
+                  : audioState.autoplayBlocked
+                  ? 'border border-[#C9A24B] bg-[#300B18] text-[#C9A24B] hover:bg-[#C9A24B]/20 ring-2 ring-[#C9A24B]/60 animate-pulse'
+                  : 'border border-[#C9A24B]/50 hover:border-[#C9A24B] bg-[#300B18] text-[#C9A24B] hover:text-[#FAF6EC] hover:bg-[#C9A24B]/15'
+              }`}
+              title={
+                audioState.isPlaying
+                  ? 'Pause Official Thanksgiving Song'
+                  : 'Play Official Thanksgiving Song: The Triumph of Eziokwubundu I'
+              }
+              aria-label={
+                audioState.isPlaying
+                  ? 'Pause Official Thanksgiving Song'
+                  : 'Play Official Thanksgiving Song'
+              }
+            >
+              {audioState.isLoading ? (
+                <Loader2 size={15} className="animate-spin text-[#C9A24B]" />
+              ) : audioState.isPlaying ? (
+                <Pause size={15} className="fill-[#C9A24B] text-[#C9A24B]" />
+              ) : (
+                <Play size={15} className="fill-[#C9A24B] text-[#C9A24B] ml-0.5" />
               )}
-            </div>
+            </button>
 
             {/* 3. Hamburger Menu Icon Button */}
             <button
