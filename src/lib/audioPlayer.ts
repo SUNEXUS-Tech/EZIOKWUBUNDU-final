@@ -49,7 +49,7 @@ class OfficialAudioPlayer {
       this.audio = new Audio();
       this.audio.src = this.audioSrc;
       this.audio.preload = 'auto';
-      this.audio.loop = true;
+      this.audio.loop = false;
       this.audio.volume = this.state.volume;
 
       // Event listeners on HTMLAudioElement
@@ -59,6 +59,10 @@ class OfficialAudioPlayer {
 
       this.audio.addEventListener('pause', () => {
         this.updateState({ isPlaying: false });
+      });
+
+      this.audio.addEventListener('ended', () => {
+        this.updateState({ isPlaying: false, isLoading: false });
       });
 
       this.audio.addEventListener('waiting', () => {
@@ -223,13 +227,21 @@ class OfficialAudioPlayer {
     }
   }
 
+  private isToggling = false;
+
   public async toggle(): Promise<boolean> {
+    if (this.isToggling) return this.state.isPlaying;
+    this.isToggling = true;
     this.userInteracted = true;
-    if (this.state.isPlaying) {
-      this.pause();
-      return false;
-    } else {
-      return await this.play();
+    try {
+      if (this.state.isPlaying) {
+        this.pause();
+        return false;
+      } else {
+        return await this.play();
+      }
+    } finally {
+      this.isToggling = false;
     }
   }
 

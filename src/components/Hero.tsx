@@ -1,14 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, ChevronDown } from 'lucide-react';
+import { Calendar, ChevronDown, Play, Pause } from 'lucide-react';
 import { EVENT_DETAILS } from '../data/content';
+import { officialAudio, AudioState } from '../lib/audioPlayer';
 
 export const Hero: React.FC = () => {
+  const [audioState, setAudioState] = useState<AudioState>(() => officialAudio.getState());
   const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; seconds: number }>({
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
   });
+
+  useEffect(() => {
+    const unsubscribe = officialAudio.subscribe((state) => {
+      setAudioState(state);
+    });
+    return unsubscribe;
+  }, []);
+
+  const handleToggleMusic = async () => {
+    try {
+      await officialAudio.toggle();
+    } catch (err) {
+      console.error('Hero audio toggle error', err);
+    }
+  };
 
   useEffect(() => {
     const targetDate = new Date('2026-11-14T16:00:00').getTime();
@@ -118,13 +135,24 @@ export const Hero: React.FC = () => {
                 Explore the Testimony
               </a>
 
-              <a
-                href="#celebration"
-                className="px-5 py-3 rounded-full border border-[#C9A24B] text-[#FAF6EC] font-medium text-xs sm:text-sm tracking-wide hover:bg-[#C9A24B]/20 transition-all flex items-center gap-2 shadow-md whitespace-nowrap"
+              <button
+                type="button"
+                onClick={handleToggleMusic}
+                className={`px-5 py-3 rounded-full border border-[#C9A24B] text-[#FAF6EC] font-medium text-xs sm:text-sm tracking-wide transition-all flex items-center gap-2 shadow-md whitespace-nowrap active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#C9A24B]/50 cursor-pointer ${
+                  audioState.isPlaying
+                    ? 'bg-[#C9A24B]/25 hover:bg-[#C9A24B]/35 shadow-[#C9A24B]/25'
+                    : 'hover:bg-[#C9A24B]/20 bg-transparent'
+                }`}
+                aria-label={audioState.isPlaying ? 'Pause Music' : 'Play Music'}
+                title={audioState.isPlaying ? 'Pause Music' : 'Play Music'}
               >
-                <Calendar size={14} className="text-[#C9A24B]" />
-                <span>Celebration Details</span>
-              </a>
+                {audioState.isPlaying ? (
+                  <Pause size={14} className="fill-[#C9A24B] text-[#C9A24B]" />
+                ) : (
+                  <Play size={14} className="fill-[#C9A24B] text-[#C9A24B] ml-0.5" />
+                )}
+                <span>{audioState.isPlaying ? 'Pause Music' : 'Play Music'}</span>
+              </button>
             </div>
           </div>
 
