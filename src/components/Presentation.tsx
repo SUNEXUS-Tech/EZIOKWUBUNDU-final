@@ -81,7 +81,7 @@ export const Presentation: React.FC = () => {
     const next = Math.max(0, Math.min(slides.length - 1, index));
     setSlideIndex(next);
     const audio = audioRef.current;
-    if (audio && next < slides.length - 1) {
+    if (audio) {
       audio.currentTime = starts[next];
       setCurrentTime(starts[next]);
     }
@@ -183,6 +183,7 @@ export const Presentation: React.FC = () => {
       <div className="sun-film-grain" aria-hidden="true" />
       {!started ? (
         <section className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 text-center">
+          <button onClick={closePresentation} className="sun-control absolute left-5 top-5 sm:left-8 sm:top-8"><ArrowLeft size={17} /><span>Back to website</span></button>
           <p className="sun-eyebrow mb-6">{EVENT_DETAILS.eventName}</p>
           <p className="sun-title-kicker mb-5">A Thanksgiving Tribute</p>
           <h1 className="sun-main-title max-w-5xl">{EVENT_DETAILS.title}</h1>
