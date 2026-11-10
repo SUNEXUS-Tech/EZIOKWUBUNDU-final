@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { X, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
 export interface ImageViewerItem {
   src: string;
@@ -7,6 +7,7 @@ export interface ImageViewerItem {
   title?: string;
   caption?: string;
   category?: string;
+  dateOrEra?: string;
 }
 
 interface ImageViewerContextType {
@@ -23,6 +24,10 @@ export const ImageViewerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isOpen, setIsOpen] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
+
+  // Touch handling for mobile swipe and double-tap zoom
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const lastTapRef = useRef<number>(0);
 
   const openViewer = useCallback((newItems: ImageViewerItem | ImageViewerItem[], startIndex = 0) => {
     const list = Array.isArray(newItems) ? newItems : [newItems];
@@ -112,7 +117,7 @@ export const ImageViewerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return () => document.removeEventListener('click', handleDocumentClick);
   }, [openViewer]);
 
-  // Lock body scroll and handle keyboard shortcuts
+  // Lock body scroll and handle keyboard navigation
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -123,8 +128,6 @@ export const ImageViewerProvider: React.FC<{ children: React.ReactNode }> = ({ c
           nextImage();
         } else if (e.key === 'ArrowLeft') {
           prevImage();
-        } else if (e.key === 'z' || e.key === 'Z') {
-          toggleZoom();
         }
       };
       window.addEventListener('keydown', handleKeyDown);
@@ -135,7 +138,50 @@ export const ImageViewerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     } else {
       document.body.style.overflow = '';
     }
-  }, [isOpen, closeViewer, nextImage, prevImage, toggleZoom]);
+  }, [isOpen, closeViewer, nextImage, prevImage]);
+
+  // Touch handlers for mobile swipe navigation and double-tap zoom
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchStartRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+        time: Date.now(),
+      };
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const now = Date.now();
+    const lastTap = lastTapRef.current;
+    const touchStart = touchStartRef.current;
+
+    // Double tap detection (< 300ms between taps with minimal movement)
+    if (now - lastTap < 300) {
+      toggleZoom();
+      lastTapRef.current = 0;
+      touchStartRef.current = null;
+      return;
+    }
+    lastTapRef.current = now;
+
+    if (!touchStart || e.changedTouches.length === 0) return;
+
+    const deltaX = e.changedTouches[0].clientX - touchStart.x;
+    const deltaY = e.changedTouches[0].clientY - touchStart.y;
+    const duration = now - touchStart.time;
+
+    // Horizontal swipe threshold: > 45px distance, mostly horizontal, within 450ms
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4 && duration < 450) {
+      if (deltaX < 0) {
+        nextImage();
+      } else {
+        prevImage();
+      }
+    }
+
+    touchStartRef.current = null;
+  };
 
   const active = items[currentIndex];
 
@@ -143,126 +189,144 @@ export const ImageViewerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     <ImageViewerContext.Provider value={{ openViewer, closeViewer, openImage, closeImage }}>
       {children}
 
-      {/* Full-Screen Website-Wide Lightbox Modal */}
+      {/* Full-Screen Exhibition Lightbox Modal with Deep Charcoal-Wine Background */}
       {isOpen && active && (
         <div
           data-image-viewer="true"
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-3 sm:p-6 text-white animate-fadeIn select-none"
+          className="fixed inset-0 z-50 bg-[#211016] flex flex-col justify-between text-[#F5EEDF] animate-fadeIn select-none overflow-hidden"
           onClick={(e) => {
             if (e.target === e.currentTarget) closeViewer();
           }}
           role="dialog"
           aria-modal="true"
-          aria-label={active.alt}
+          aria-label={active.title || active.alt}
         >
-          {/* Top Bar Controls */}
-          <div className="flex items-center justify-between max-w-6xl mx-auto w-full pt-1 pb-2 border-b border-white/10 z-20">
-            <div className="text-left pr-4 min-w-0">
-              <div className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs text-[#C9A24B] uppercase tracking-widest font-semibold">
-                <Sparkles size={12} className="text-[#E0BE6C]" />
-                <span>{active.category || 'Eziokwubundu I Archive'}</span>
+          {/* 1. Header Bar: Deep Burgundy #571D2B, full title without truncation, close button on far right */}
+          <header className="bg-[#571D2B] border-b border-[#B18A43]/30 px-4 sm:px-8 py-3.5 sm:py-4 z-30 shadow-md flex items-center justify-between gap-4">
+            <div className="flex-1 text-left min-w-0 pr-2">
+              <div className="flex items-center gap-2 text-[#E7D5A9] text-[11px] sm:text-xs uppercase tracking-[0.2em] font-semibold mb-0.5">
+                <Sparkles size={13} className="text-[#B18A43] shrink-0" />
+                <span className="truncate">{active.category || 'The Triumph of Eziokwubundu I'}</span>
+                {active.dateOrEra && (
+                  <>
+                    <span className="text-[#B18A43]" aria-hidden="true">·</span>
+                    <span className="text-[#E7D5A9]/80 font-normal">{active.dateOrEra}</span>
+                  </>
+                )}
               </div>
-              <p className="font-serif text-sm sm:text-base font-bold text-white truncate max-w-md sm:max-w-xl">
+              <h2 className="font-serif text-base sm:text-xl font-bold text-[#F5EEDF] leading-snug break-words">
                 {active.title || active.alt}
-              </p>
+              </h2>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              {items.length > 1 && (
-                <span className="text-xs text-white/60 tracking-wider font-mono mr-1">
-                  {currentIndex + 1} / {items.length}
-                </span>
-              )}
-
-              <button
-                onClick={toggleZoom}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-[#C9A24B] hover:text-[#4A0E1F] text-xs font-medium transition-all text-white border border-white/20 cursor-pointer"
-                title={isZoomed ? 'Reset zoom (or press Z)' : 'Zoom in (or press Z)'}
-                aria-label={isZoomed ? 'Reset Zoom' : 'Zoom In'}
-              >
-                {isZoomed ? <ZoomOut size={15} /> : <ZoomIn size={15} />}
-                <span className="hidden sm:inline">{isZoomed ? 'Reset' : 'Zoom'}</span>
-              </button>
-
+            <div className="shrink-0">
               <button
                 onClick={closeViewer}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors text-white border border-white/20 cursor-pointer"
-                aria-label="Close Lightbox"
+                className="w-10 h-10 rounded-full bg-[#211016]/80 hover:bg-[#B18A43] hover:text-[#211016] text-[#F5EEDF] border border-[#B18A43]/40 flex items-center justify-center transition-all cursor-pointer shadow-md focus:outline-none focus:ring-2 focus:ring-[#B18A43]"
+                aria-label="Close Lightbox (Esc)"
                 title="Close (Esc)"
               >
                 <X size={20} />
               </button>
             </div>
-          </div>
+          </header>
 
-          {/* Central Image Viewer Stage */}
+          {/* 2. Central Image Viewer Stage */}
           <div
-            className="relative flex-1 flex items-center justify-center max-w-6xl mx-auto w-full my-2 sm:my-3 overflow-hidden"
+            className="relative flex-1 flex items-center justify-center w-full px-2 sm:px-6 py-2 overflow-hidden"
             onClick={(e) => {
               if (e.target === e.currentTarget) closeViewer();
             }}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           >
-            {/* Previous Image Button (if collection) */}
+            {/* Previous Image Navigation Arrow */}
             {items.length > 1 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   prevImage();
                 }}
-                className="absolute left-2 sm:left-4 z-30 w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-black/60 hover:bg-[#C9A24B] hover:text-[#4A0E1F] text-white flex items-center justify-center transition-all border border-white/20 cursor-pointer shadow-lg"
-                aria-label="Previous photograph"
+                className="absolute left-3 sm:left-6 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#571D2B]/90 hover:bg-[#B18A43] text-[#F5EEDF] hover:text-[#211016] border border-[#B18A43]/50 flex items-center justify-center transition-all cursor-pointer shadow-xl active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#B18A43]"
+                aria-label="Previous photograph (Left arrow)"
                 title="Previous (Left arrow)"
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={26} />
               </button>
             )}
 
-            {/* Image Canvas */}
+            {/* Image Canvas with Photograph Numbering Overlay Badge */}
             <div
-              className={`max-h-[75vh] max-w-full flex items-center justify-center transition-all duration-300 ${
+              className={`relative max-h-[68vh] max-w-full flex items-center justify-center transition-all duration-300 ${
                 isZoomed ? 'cursor-zoom-out overflow-auto p-4' : 'cursor-zoom-in'
               }`}
-              onClick={toggleZoom}
-              title={isZoomed ? 'Click to reset size' : 'Click to zoom in'}
+              onDoubleClick={toggleZoom}
+              title={isZoomed ? 'Double-click to reset size' : 'Double-click or double-tap to zoom'}
             >
               <img
                 src={active.src}
                 alt={active.alt}
-                className={`max-h-[74vh] max-w-[92vw] object-contain rounded-lg shadow-2xl transition-transform duration-300 select-none ${
+                className={`max-h-[66vh] max-w-[92vw] sm:max-w-[85vw] object-contain rounded-lg shadow-2xl transition-transform duration-300 select-none ${
                   isZoomed ? 'scale-150 sm:scale-175 my-auto' : 'scale-100'
                 }`}
                 loading="eager"
               />
+
+              {/* Photograph Numbering Badge: Top-right corner overlay inside image container */}
+              {items.length > 1 && (
+                <div
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 px-3 py-1 rounded-full bg-[#571D2B]/90 backdrop-blur-md border border-[#B18A43]/60 text-[#F5EEDF] text-xs font-mono font-semibold tracking-wider shadow-lg pointer-events-none"
+                  aria-label={`Photograph ${currentIndex + 1} of ${items.length}`}
+                >
+                  <span className="text-[#E7D5A9]">
+                    {String(currentIndex + 1).padStart(2, '0')}
+                  </span>
+                  <span className="text-[#B18A43] mx-1">/</span>
+                  <span className="text-[#F5EEDF]/80">
+                    {String(items.length).padStart(2, '0')}
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* Next Image Button (if collection) */}
+            {/* Next Image Navigation Arrow */}
             {items.length > 1 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   nextImage();
                 }}
-                className="absolute right-2 sm:right-4 z-30 w-10 sm:w-12 h-10 sm:h-12 rounded-full bg-black/60 hover:bg-[#C9A24B] hover:text-[#4A0E1F] text-white flex items-center justify-center transition-all border border-white/20 cursor-pointer shadow-lg"
-                aria-label="Next photograph"
+                className="absolute right-3 sm:right-6 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#571D2B]/90 hover:bg-[#B18A43] text-[#F5EEDF] hover:text-[#211016] border border-[#B18A43]/50 flex items-center justify-center transition-all cursor-pointer shadow-xl active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#B18A43]"
+                aria-label="Next photograph (Right arrow)"
                 title="Next (Right arrow)"
               >
-                <ChevronRight size={24} />
+                <ChevronRight size={26} />
               </button>
             )}
           </div>
 
-          {/* Bottom Caption & Navigation Hint */}
-          <div className="max-w-3xl mx-auto text-center pt-2 pb-1 z-20">
-            {active.caption && (
-              <p className="text-xs sm:text-sm text-white/90 leading-relaxed font-light mb-1 px-4">
-                {active.caption}
-              </p>
-            )}
-            <p className="text-[10px] text-white/50 tracking-wider">
-              {items.length > 1 ? 'Use arrow keys or buttons to navigate · ' : ''}
-              Click or tap image to zoom · Tap outside or press Esc to close
-            </p>
-          </div>
+          {/* 3. Bottom Caption Panel: Deep Burgundy #571D2B with Warm White & Antique Gold details */}
+          <footer className="bg-[#571D2B] border-t border-[#B18A43]/30 px-4 sm:px-8 py-3.5 sm:py-4.5 z-30 shadow-lg">
+            <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
+              {active.caption ? (
+                <p className="text-sm sm:text-base text-[#F5EEDF] leading-relaxed font-normal mb-2 max-w-3xl">
+                  {active.caption}
+                </p>
+              ) : active.title ? (
+                <p className="font-serif text-sm sm:text-base text-[#F5EEDF] font-medium mb-1">
+                  {active.title}
+                </p>
+              ) : null}
+
+              <div className="flex items-center justify-center gap-2 text-[11px] text-[#E7D5A9]/75 tracking-wider">
+                <span>Double-tap or double-click to {isZoomed ? 'reset' : 'zoom'}</span>
+                <span className="text-[#B18A43]" aria-hidden="true">·</span>
+                <span>Swipe or arrow keys to navigate</span>
+                <span className="text-[#B18A43] hidden sm:inline" aria-hidden="true">·</span>
+                <span className="hidden sm:inline">Esc to close</span>
+              </div>
+            </div>
+          </footer>
         </div>
       )}
     </ImageViewerContext.Provider>
@@ -276,4 +340,3 @@ export const useImageViewer = (): ImageViewerContextType => {
   }
   return context;
 };
-

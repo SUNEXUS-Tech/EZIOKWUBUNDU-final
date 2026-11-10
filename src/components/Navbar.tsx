@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Menu, X, Sparkles, Music, Loader2 } from 'lucide-react';
 import { officialAudio, AudioState } from '../lib/audioPlayer';
 
-export const Navbar: React.FC = () => {
+export interface NavbarProps {
+  isGalleryRoute?: boolean;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ isGalleryRoute = false }) => {
   const [audioState, setAudioState] = useState<AudioState>(() => officialAudio.getState());
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -107,10 +111,23 @@ export const Navbar: React.FC = () => {
 
   const handleNavClick = (href: string) => {
     setIsDrawerOpen(false);
-    const targetId = href.replace('#', '');
-    const el = document.getElementById(targetId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+    if (isGalleryRoute) {
+      window.location.hash = href;
+    } else {
+      const targetId = href.replace('#', '');
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.location.hash = href;
+      }
+    }
+  };
+
+  const handleBrandClick = (e: React.MouseEvent) => {
+    if (isGalleryRoute) {
+      e.preventDefault();
+      window.location.hash = '#hero';
     }
   };
 
@@ -128,6 +145,7 @@ export const Navbar: React.FC = () => {
           {/* 1. Brand Identity Text */}
           <a
             href="#hero"
+            onClick={handleBrandClick}
             className="flex flex-col text-left group transition-opacity hover:opacity-95 focus:outline-none min-w-0 select-none"
             aria-label="The Triumph of Eziokwubundu I Homepage"
           >

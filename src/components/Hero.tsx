@@ -2,15 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, ChevronDown, Play, Pause } from 'lucide-react';
 import { EVENT_DETAILS } from '../data/content';
 import { officialAudio, AudioState } from '../lib/audioPlayer';
+import { calculateCountdown, getTargetEpochMs, CountdownState } from '../utils/countdown';
 
 export const Hero: React.FC = () => {
   const [audioState, setAudioState] = useState<AudioState>(() => officialAudio.getState());
-  const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; seconds: number }>({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+  const [timeLeft, setTimeLeft] = useState<CountdownState>(() => calculateCountdown(getTargetEpochMs()));
 
   useEffect(() => {
     const unsubscribe = officialAudio.subscribe((state) => {
@@ -28,21 +24,12 @@ export const Hero: React.FC = () => {
   };
 
   useEffect(() => {
-    const targetDate = new Date('2026-11-14T16:00:00').getTime();
+    // Calculates exact event target in "America/Chicago" timezone (Garland, TX - 7:00 PM CST)
+    const targetEpoch = getTargetEpochMs();
 
     const updateCountdown = () => {
-      const now = new Date().getTime();
-      const difference = targetDate - now;
-
-      if (difference <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      } else {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-        setTimeLeft({ days, hours, minutes, seconds });
-      }
+      const state = calculateCountdown(targetEpoch);
+      setTimeLeft(state);
     };
 
     updateCountdown();
@@ -100,30 +87,41 @@ export const Hero: React.FC = () => {
                 </span>
                 <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full border border-[#C9A24B]/50 bg-[#3B0A18]/70 text-[#FAF6EC] text-[10px] sm:text-xs tracking-wider font-medium shadow-sm">
                   <Calendar size={12} className="text-[#C9A24B]" />
-                  <span>{EVENT_DETAILS.dateFormatted}</span>
+                  <span>{EVENT_DETAILS.dateFormattedCaps}</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-2.5 sm:gap-3 lg:gap-3.5">
-                {[
-                  { label: 'Days', value: timeLeft.days },
-                  { label: 'Hours', value: timeLeft.hours },
-                  { label: 'Minutes', value: timeLeft.minutes },
-                  { label: 'Seconds', value: timeLeft.seconds },
-                ].map((unit, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-[#3B0A18]/90 border border-[#C9A24B]/35 rounded-lg py-2.5 sm:py-3 px-1.5 sm:px-2 text-center backdrop-blur-sm shadow-inner"
-                  >
-                    <span className="block font-serif text-lg sm:text-2xl lg:text-2xl xl:text-3xl font-bold text-[#FAF6EC] leading-tight">
-                      {String(unit.value).padStart(2, '0')}
-                    </span>
-                    <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-[#C9A24B] font-semibold mt-1">
-                      {unit.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              {timeLeft.isEventStarted ? (
+                <div className="bg-[#3B0A18]/95 border border-[#C9A24B]/50 rounded-xl py-3.5 px-5 text-center backdrop-blur-sm shadow-lg">
+                  <span className="text-[#C9A24B] font-serif font-bold text-base sm:text-lg tracking-wider block">
+                    The Celebration Has Begun!
+                  </span>
+                  <span className="text-[11px] sm:text-xs text-[#FAF6EC]/85 block mt-0.5">
+                    Welcome to {EVENT_DETAILS.eventName} · Garland, TX
+                  </span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-2.5 sm:gap-3 lg:gap-3.5">
+                  {[
+                    { label: 'Days', value: timeLeft.days },
+                    { label: 'Hours', value: timeLeft.hours },
+                    { label: 'Minutes', value: timeLeft.minutes },
+                    { label: 'Seconds', value: timeLeft.seconds },
+                  ].map((unit, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-[#3B0A18]/90 border border-[#C9A24B]/35 rounded-lg py-2.5 sm:py-3 px-1.5 sm:px-2 text-center backdrop-blur-sm shadow-inner"
+                    >
+                      <span className="block font-serif text-lg sm:text-2xl lg:text-2xl xl:text-3xl font-bold text-[#FAF6EC] leading-tight">
+                        {String(unit.value).padStart(2, '0')}
+                      </span>
+                      <span className="text-[9px] sm:text-[10px] uppercase tracking-wider text-[#C9A24B] font-semibold mt-1">
+                        {unit.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Call to Actions */}

@@ -80,12 +80,14 @@ export const Celebration: React.FC = () => {
                 <div className="w-9 h-9 rounded-full bg-[#4A0E1F] border border-[#C9A24B] flex items-center justify-center text-[#C9A24B] shrink-0">
                   <MapPin size={16} />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <span className="text-[10px] text-[#C9A24B] uppercase tracking-wider block font-medium">Location</span>
-                  <span className="text-xs sm:text-sm text-[#FAF6EC]/90 font-medium">
+                  <span className="text-xs sm:text-sm text-[#FAF6EC] font-semibold block">
                     {EVENT_DETAILS.venue}
                   </span>
-                  <span className="text-[11px] text-[#FAF6EC]/60 block">{EVENT_DETAILS.address}</span>
+                  <span className="text-[11px] sm:text-xs text-[#FAF6EC]/75 block mt-0.5 break-words">
+                    {EVENT_DETAILS.address}
+                  </span>
                 </div>
               </div>
             </div>
@@ -131,14 +133,14 @@ export const Celebration: React.FC = () => {
               <div className="relative rounded-xl overflow-hidden shadow-2xl border border-[#C9A24B] bg-[#3B0A18]">
                 <img
                   src="/images/celebration-02.webp"
-                  alt="Jude Ifeanyi Anwukah and his wife in ceremonial attire on the red carpet at the celebration"
+                  alt="Jude Ifeanyi Anwukah and his wife in ceremonial attire at the celebration"
                   className="w-full h-auto object-cover max-h-[480px] group-hover:scale-102 transition-transform duration-700 cursor-pointer"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute bottom-3 left-4 right-4 text-center pointer-events-none">
                   <p className="text-[#C9A24B] text-[10px] uppercase tracking-[0.25em] font-semibold mb-0.5">
-                    Red Carpet &amp; Fellowship
+                    Solemn &amp; Joyous Fellowship
                   </p>
                   <p className="font-serif text-white font-bold text-base sm:text-lg">
                     A Triumphant Celebration
