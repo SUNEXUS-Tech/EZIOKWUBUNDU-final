@@ -73,9 +73,23 @@ export const Presentation: React.FC = () => {
   const [slideIndex, setSlideIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [audioError, setAudioError] = useState('');
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const controlsTimerRef = useRef<number | null>(null);
   const slide = slides[slideIndex];
   const trackDuration = audioRef.current?.duration && Number.isFinite(audioRef.current.duration) ? audioRef.current.duration : totalDuration;
   const progress = Math.min(100, (currentTime / trackDuration) * 100);
+
+  const revealControls = useCallback(() => {
+    setControlsVisible(true);
+    if (controlsTimerRef.current !== null) window.clearTimeout(controlsTimerRef.current);
+    controlsTimerRef.current = window.setTimeout(() => setControlsVisible(false), 3500);
+  }, []);
+
+  const handlePresentationPointerDown = (event: React.PointerEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement;
+    if (target.closest('button')) revealControls();
+    else setControlsVisible((visible) => !visible);
+  };
 
   const goToSlide = useCallback((index: number) => {
     const next = Math.max(0, Math.min(slides.length - 1, index));
@@ -170,7 +184,17 @@ export const Presentation: React.FC = () => {
 
   useEffect(() => () => {
     audioRef.current?.pause();
+    if (controlsTimerRef.current !== null) window.clearTimeout(controlsTimerRef.current);
   }, []);
+
+  useEffect(() => {
+    if (!started || !controlsVisible) return;
+    if (controlsTimerRef.current !== null) window.clearTimeout(controlsTimerRef.current);
+    controlsTimerRef.current = window.setTimeout(() => setControlsVisible(false), 3500);
+    return () => {
+      if (controlsTimerRef.current !== null) window.clearTimeout(controlsTimerRef.current);
+    };
+  }, [started, controlsVisible, slideIndex]);
 
   const cards = slide.cards ?? [];
   const displayImage = slide.kind === 'photo' ? slide.photo?.imageSrc : slide.image;
@@ -178,7 +202,7 @@ export const Presentation: React.FC = () => {
   const body = slide.kind === 'photo' ? [slide.photo?.caption ?? '', slide.photo?.dateOrEra ?? ''].filter(Boolean) : slide.body ?? [];
 
   return (
-    <main className="sun-presentation fixed inset-0 z-[100] flex min-h-[100svh] flex-col overflow-hidden bg-[#3B0A18] text-[#FAF6EC]" aria-label="Eziokwubundu I cinematic presentation">
+    <main onPointerDown={started ? handlePresentationPointerDown : undefined} className="sun-presentation fixed inset-0 z-[100] flex min-h-[100svh] flex-col overflow-hidden bg-[#3B0A18] text-[#FAF6EC]" aria-label="Eziokwubundu I cinematic presentation">
       <audio ref={audioRef} src="/audio/EZIOKWUBUNDU_df0b5da6.mp3" preload="auto" />
       <div className="sun-film-grain" aria-hidden="true" />
       {!started ? (
@@ -194,7 +218,7 @@ export const Presentation: React.FC = () => {
         </section>
       ) : (
         <>
-          <header className="relative z-20 flex items-center justify-between gap-4 px-5 py-4 sm:px-8">
+          <header className={`sun-chrome relative z-20 flex items-center justify-between gap-4 px-5 py-4 sm:px-8 ${controlsVisible ? 'is-visible' : 'is-hidden'}`}>
             <button onClick={closePresentation} className="sun-control" aria-label="Close presentation"><ArrowLeft size={17} /><span className="hidden sm:inline">Back to website</span></button>
             <div className="text-center"><span className="sun-eyebrow">{EVENT_DETAILS.titleHonorific}</span><span className="ml-3 text-[10px] text-[#FAF6EC]/45">{String(slideIndex + 1).padStart(2, '0')} / {slides.length}</span></div>
             <button onClick={() => document.fullscreenElement ? void document.exitFullscreen() : void document.documentElement.requestFullscreen?.()} className="sun-control" aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>{isFullscreen ? <Minimize size={17} /> : <Maximize size={17} />}</button>
@@ -222,7 +246,7 @@ export const Presentation: React.FC = () => {
               </div>
             )}
           </section>
-          <footer className="relative z-20 px-5 pb-4 sm:px-8">
+          <footer className={`sun-chrome relative z-20 px-5 pb-4 sm:px-8 ${controlsVisible ? 'is-visible' : 'is-hidden'}`}>
             <div className="mb-3 h-[2px] w-full overflow-hidden bg-[#FAF6EC]/15"><div className="h-full bg-[#C9A24B] transition-[width] duration-200" style={{ width: `${progress}%` }} /></div>
             <div className="flex items-center justify-between gap-3">
               <button onClick={() => goToSlide(slideIndex - 1)} className="sun-control" disabled={slideIndex === 0}><ArrowLeft size={17} /><span className="hidden sm:inline">Previous</span></button>
@@ -235,6 +259,7 @@ export const Presentation: React.FC = () => {
         </>
       )}
       <style>{`
+        .sun-chrome{opacity:1;visibility:visible;transition:opacity .35s ease,visibility .35s ease}.sun-chrome.is-hidden{opacity:0;visibility:hidden;pointer-events:none}.sun-chrome.is-visible{opacity:1;visibility:visible;pointer-events:auto}
         .sun-presentation{font-family:'Plus Jakarta Sans',sans-serif;background:radial-gradient(ellipse at 50% 45%,#5a1b2b 0%,#3B0A18 58%,#26050e 100%);--sun-gold:#C9A24B}
         .sun-film-grain{position:absolute;inset:0;pointer-events:none;opacity:.12;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E")}
         .sun-eyebrow{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:#C9A24B;font-weight:600}
