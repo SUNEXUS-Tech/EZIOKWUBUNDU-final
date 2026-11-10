@@ -13,6 +13,7 @@ type Slide = {
   imageSide?: 'left' | 'right';
   cards?: { title: string; body: string }[];
   photo?: (typeof GALLERY_ITEMS)[number];
+  extraImages?: string[];
   duration: number;
 };
 
@@ -45,7 +46,7 @@ const slides: Slide[] = [
   { kind: 'quote', eyebrow: 'A Turning Point', title: 'The Lord had another chapter to write.', body: ['This is a family testimony of a difficult season, the power of prayer, and the divine grace that carried him through it.', '“Lord, You who formed him in his mother’s womb and granted him a heart of integrity, breathe upon Jude now. Where medical science meets its threshold, let Your divine sovereignty prevail. Restore his vigor, sustain his loved ones, and turn this hospital bed into an altar of praise.”', 'Psalm 118:17 — “I shall not die, but live, and declare the works of the Lord.”'], duration: 11 },
   { kind: 'story', eyebrow: 'The Grace of God', title: 'When hope found a reason to celebrate.', image: '/images/grace.webp', imageAlt: 'Jude supported by his wife during hospital recovery', imageSide: 'right', body: ['What once seemed like an insurmountable valley blossomed into an enduring altar of thanksgiving and joy.', 'Jude’s courageous turnaround is a living testament to God’s mercy, the potency of collective prayer, and the fragile sacredness of human existence.', 'We gather not simply to remember pain, but to celebrate the magnificent gift of life, faith over fear, and the joy of being together.'], duration: 14 },
   { kind: 'story', eyebrow: 'Milestones of Restoration', title: 'Grace, one milestone at a time.', image: '/images/journey-02.webp', imageAlt: 'Jude awake in the hospital after extubation', imageSide: 'left', cards: [{ title: 'The Turning Point', body: 'Vitals stabilized against all odds, surprising medical teams with supernatural recovery.' }, { title: 'Loving Presence', body: 'An unbroken vigil of loved ones, holding hands in quiet solidarity and unceasing hope.' }, { title: 'Renewed Vigor', body: 'Returning on his feet with vitality, sound mind, and a heart brimming with praise.' }], duration: 14 },
-  { kind: 'story', eyebrow: 'Restoration Realized', title: 'What a difference a day can make.', image: '/images/recovery-01.webp', imageAlt: 'Jude resting peacefully and breathing freely', imageSide: 'right', body: ['As healing poured through his body, fear gave way to gratitude.', 'Tubes were removed, eyes opened with clarity, voice returned with warmth, and laughter once again filled the room.', 'A family that prayed through uncertainty now has another chapter to celebrate.'], quote: 'What a difference a day can make. What a testimony grace can write.', duration: 14 },
+  { kind: 'story', eyebrow: 'Restoration Realized', title: 'What a difference a day can make.', image: '/images/recovery-01.webp', imageAlt: 'Jude resting peacefully and breathing freely', imageSide: 'right', body: ['As healing poured through his body, fear gave way to gratitude.', 'Tubes were removed, eyes opened with clarity, voice returned with warmth, and laughter once again filled the room.', 'A family that prayed through uncertainty now has another chapter to celebrate.'], quote: 'What a difference a day can make. What a testimony grace can write.', extraImages: ['/images/recovery-02.webp', '/images/recovery-03.webp'], duration: 14 },
   { kind: 'story', eyebrow: 'A Legacy of Generosity', title: 'His generosity is part of his story.', image: '/images/legacy-01.webp', imageAlt: 'Jude smiling warmly in traditional attire', imageSide: 'left', body: ['A person’s true impact is not measured only by what they achieve, but by the lives they influence, the burdens they lift, and the smiles they restore.', 'Jude’s generosity and deep personal investment in young people, especially within his extended family and ancestral community, form a foundational pillar of the triumph we celebrate.', 'His willingness to support others speaks of a life that values people, fosters opportunity, and protects the future of the next generation.'], duration: 10 },
   { kind: 'story', eyebrow: 'A Life That Opens Doors', title: 'A pillar to family and community.', image: '/images/legacy-02.webp', imageAlt: 'Jude standing in red ceremonial chieftain attire', imageSide: 'right', cards: [{ title: 'Youth & Education', body: 'Sponsoring schooling, educational requirements, and apprenticeships for young relatives and community members.' }, { title: 'Extended Family Pillar', body: 'A dependable beacon during family meetings, communal deliberations, and times of need.' }, { title: 'Quiet Benevolence', body: 'Touching lives, settling medical bills, and easing hardships with no expectation of praise.' }], duration: 11 },
   { kind: 'quote', eyebrow: 'Enduring Testament', title: 'The good we leave in other lives.', body: ['The sea of love surrounding him today is a mirror of the many lives he has quietly touched.', 'His legacy is carried forward in opportunity shared, burdens eased, and people encouraged.'], quote: 'The greatest legacy is the good we leave in other lives.', duration: 11 },
@@ -56,8 +57,8 @@ const slides: Slide[] = [
   { kind: 'story', eyebrow: 'The Gift of Life', title: 'Every breath is a sacred testament.', body: [THANKSGIVING_PILLARS[0].description], duration: 12 },
   { kind: 'story', eyebrow: 'The Strength to Endure', title: 'Strength through the long nights.', body: [THANKSGIVING_PILLARS[1].description, THANKSGIVING_PILLARS[2].description], duration: 12 },
   { kind: 'story', eyebrow: 'Family, Friends & Another Chapter', title: 'The people who stood firm.', body: [THANKSGIVING_PILLARS[3].description, THANKSGIVING_PILLARS[4].description], duration: 10 },
-  { kind: 'quote', eyebrow: 'A Thanksgiving Inscription', title: 'Every good and perfect gift comes from above.', body: ['Today, we celebrate with joyful and humble hearts, acknowledging the goodness of the Lord.', 'For life preserved, strength renewed, family gathered, and another chapter granted—we give thanks.'], quote: 'To God be the glory, now and always.', duration: 5 },
-  { kind: 'gallery-intro', eyebrow: 'The Complete Photographic Exhibition', title: 'A life in pictures.', body: ['Twenty-seven photographs. One testimony of heritage, hardship, healing, family, and thanksgiving.', 'Each image appears once in this presentation.'], duration: 8 },
+  { kind: 'quote', eyebrow: 'A Thanksgiving Inscription', title: 'Every good and perfect gift comes from above.', body: ['Today, we celebrate with joyful and humble hearts, acknowledging the goodness of the Lord.', 'For life preserved, strength renewed, family gathered, and another chapter granted—we give thanks.'], quote: 'To God be the glory, now and always.', duration: 10 },
+  { kind: 'gallery-intro', eyebrow: 'The Complete Photographic Exhibition', title: 'A life in pictures.', body: ['Twenty-seven photographs. One testimony of heritage, hardship, healing, family, and thanksgiving.', 'Each image appears once in this presentation.'], duration: 5 },
   ...galleryPhotos.map((photo, index) => ({ kind: 'photo' as const, title: photo.title, eyebrow: photo.category, photo, duration: 8, imageSide: index % 2 === 0 ? 'left' as const : 'right' as const })),
   { kind: 'final', eyebrow: 'In Thanksgiving & Praise', title: 'To God be the glory, now and always.', body: [EVENT_DETAILS.honoree, EVENT_DETAILS.titleHonorific, 'A life of integrity. A journey of grace. A testimony of gratitude.'], quote: 'THE TRIUMPH OF EZIOKWUBUNDU I', duration: 20.24 },
 ];
@@ -67,7 +68,6 @@ const totalDuration = slides.reduce((sum, slide) => sum + slide.duration, 0);
 
 export const Presentation: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const frameRef = useRef<number | null>(null);
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -167,7 +167,6 @@ export const Presentation: React.FC = () => {
   }, [closePresentation, goToSlide, slideIndex, started]);
 
   useEffect(() => () => {
-    if (frameRef.current) cancelAnimationFrame(frameRef.current);
     audioRef.current?.pause();
   }, []);
 
@@ -216,7 +215,7 @@ export const Presentation: React.FC = () => {
                   {cards.length > 0 && <div className="sun-cards">{cards.map((card, i) => <article key={card.title} className="sun-card" style={{ animationDelay: `${250 + i * 130}ms` }}><h3>{card.title}</h3><p>{card.body}</p></article>)}</div>}
                   {slide.quote && <blockquote className="sun-quote">{slide.quote}</blockquote>}
                 </div>
-                {displayImage && <figure className="sun-photo"><img src={displayImage} alt={imageAlt ?? ''} /><figcaption>{slide.kind === 'photo' ? slide.photo?.title : slide.imageAlt}</figcaption></figure>}
+                {displayImage && <figure className="sun-photo"><img src={displayImage} alt={imageAlt ?? ''} /><figcaption>{slide.kind === 'photo' ? slide.photo?.title : slide.imageAlt}</figcaption>{slide.extraImages?.length ? <div className="sun-extra-photos">{slide.extraImages.map((src) => <img key={src} src={src} alt="Jude’s continuing recovery" />)}</div> : null}</figure>}
               </div>
             )}
           </section>
@@ -251,7 +250,7 @@ export const Presentation: React.FC = () => {
         .sun-copy{max-width:760px}.sun-body{font-size:clamp(13px,1.25vw,18px);line-height:1.7;color:#FAF6ECb8;margin-top:13px;animation:sunRise .7s ease both}
         .sun-photo{position:relative;max-height:min(62vh,650px);border:1px solid #C9A24B99;padding:7px;background:#26050e;box-shadow:0 25px 80px #0005;animation:sunRise .8s ease both}
         .sun-photo img{display:block;width:100%;height:min(58vh,620px);object-fit:contain;background:#1e040b}
-        .sun-photo figcaption{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#C9A24B;padding:10px 6px 3px}
+        .sun-extra-photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:7px}.sun-extra-photos img{width:100%;height:clamp(70px,13vh,130px);object-fit:cover;background:#1e040b}.sun-photo figcaption{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#C9A24B;padding:10px 6px 3px}
         .sun-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:22px}
         .sun-card{border-top:1px solid #C9A24B99;background:#FAF6EC0d;padding:13px 12px;animation:sunRise .7s ease both}
         .sun-card h3{font-family:'Playfair Display',serif;color:#E7D5A9;font-size:13px;margin-bottom:6px}.sun-card p{font-size:10px;line-height:1.5;color:#FAF6ECb0}
