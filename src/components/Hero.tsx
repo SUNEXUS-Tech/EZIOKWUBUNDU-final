@@ -127,6 +127,13 @@ export const Hero: React.FC = () => {
             {/* Call to Actions */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3.5 sm:gap-4 w-full">
               <a
+                href="/presentation"
+                className="px-6 py-3 rounded-full border border-[#C9A24B]/70 text-[#FAF6EC] font-semibold text-xs sm:text-sm tracking-wide hover:bg-[#C9A24B]/15 transition-all shadow-lg whitespace-nowrap"
+              >
+                View Presentation
+              </a>
+
+              <a
                 href="#man"
                 className="px-6 py-3 rounded-full bg-[#C9A24B] text-[#4A0E1F] font-semibold text-xs sm:text-sm tracking-wide hover:bg-[#E0BE6C] transition-all shadow-lg hover:shadow-[#C9A24B]/20 whitespace-nowrap"
               >
