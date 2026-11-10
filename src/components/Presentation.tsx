@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Maximize, Minimize, Pause, Play, Volume2 } from 'lucide-react';
 import { EVENT_DETAILS, GALLERY_ITEMS, THANKSGIVING_PILLARS } from '../data/content';
 
@@ -74,7 +74,8 @@ export const Presentation: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [audioError, setAudioError] = useState('');
   const slide = slides[slideIndex];
-  const progress = Math.min(100, (currentTime / totalDuration) * 100);
+  const trackDuration = audioRef.current?.duration && Number.isFinite(audioRef.current.duration) ? audioRef.current.duration : totalDuration;
+  const progress = Math.min(100, (currentTime / trackDuration) * 100);
 
   const goToSlide = useCallback((index: number) => {
     const next = Math.max(0, Math.min(slides.length - 1, index));
@@ -128,13 +129,15 @@ export const Presentation: React.FC = () => {
     const update = () => {
       const time = audio.currentTime;
       setCurrentTime(time);
-      if (time >= totalDuration) {
+      const scale = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration / totalDuration : 1;
+      const timelineTime = time / scale;
+      if (audio.ended || timelineTime >= totalDuration) {
         setSlideIndex(slides.length - 1);
         audio.pause();
         setPlaying(false);
         return;
       }
-      let index = starts.findIndex((start, i) => time >= start && time < start + slides[i].duration);
+      let index = starts.findIndex((start, i) => timelineTime >= start && timelineTime < start + slides[i].duration);
       if (index >= 0) setSlideIndex(index);
     };
     const onPlay = () => setPlaying(true);
@@ -222,7 +225,7 @@ export const Presentation: React.FC = () => {
             <div className="mb-3 h-[2px] w-full overflow-hidden bg-[#FAF6EC]/15"><div className="h-full bg-[#C9A24B] transition-[width] duration-200" style={{ width: `${progress}%` }} /></div>
             <div className="flex items-center justify-between gap-3">
               <button onClick={() => goToSlide(slideIndex - 1)} className="sun-control" disabled={slideIndex === 0}><ArrowLeft size={17} /><span className="hidden sm:inline">Previous</span></button>
-              <div className="flex items-center gap-3"><button onClick={togglePlayback} className="sun-play-control" aria-label={playing ? 'Pause soundtrack' : 'Play soundtrack'}>{playing ? <Pause size={16} /> : <Play size={16} fill="currentColor" />}</button><span className="text-[10px] tabular-nums tracking-wider text-[#FAF6EC]/60">{formatTime(currentTime)} / {formatTime(totalDuration)}</span><Volume2 size={15} className="text-[#C9A24B]" /></div>
+              <div className="flex items-center gap-3"><button onClick={togglePlayback} className="sun-play-control" aria-label={playing ? 'Pause soundtrack' : 'Play soundtrack'}>{playing ? <Pause size={16} /> : <Play size={16} fill="currentColor" />}</button><span className="text-[10px] tabular-nums tracking-wider text-[#FAF6EC]/60">{formatTime(currentTime)} / {formatTime(trackDuration)}</span><Volume2 size={15} className="text-[#C9A24B]" /></div>
               <button onClick={() => goToSlide(slideIndex + 1)} className="sun-control" disabled={slideIndex === slides.length - 1}><span className="hidden sm:inline">Next</span><ArrowRight size={17} /></button>
             </div>
             {audioError && <p role="status" className="mt-2 text-center text-xs text-[#E7D5A9]">{audioError}</p>}
