@@ -18,6 +18,7 @@ import { DedicatedGallery } from '../components/DedicatedGallery';
 import { Footer } from '../components/Footer';
 import { SectionDivider } from '../components/SectionDivider';
 import { ImageViewerProvider } from '../context/ImageViewerContext';
+import { Presentation } from '../components/Presentation';
 
 export default function App() {
   const getIsGalleryRoute = () => {
@@ -26,6 +27,16 @@ export default function App() {
   };
 
   const [isGalleryRoute, setIsGalleryRoute] = useState<boolean>(getIsGalleryRoute);
+  const [isPresentationRoute, setIsPresentationRoute] = useState<boolean>(() => window.location.pathname.replace(/\/$/, '') === '/presentation');
+
+  useEffect(() => {
+    if (window.location.pathname.replace(/\/$/, '') === '/presentation') {
+      window.history.replaceState({ ...window.history.state, presentationRoute: true }, '');
+    }
+    const handleRouteChange = () => setIsPresentationRoute(window.location.pathname.replace(/\/$/, '') === '/presentation');
+    window.addEventListener('popstate', handleRouteChange);
+    return () => window.removeEventListener('popstate', handleRouteChange);
+  }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -66,6 +77,8 @@ export default function App() {
       window.location.hash = '#gallery';
     }
   }, []);
+
+  if (isPresentationRoute) return <Presentation />;
 
   return (
     <ImageViewerProvider>
