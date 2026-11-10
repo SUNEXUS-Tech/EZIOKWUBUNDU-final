@@ -27,18 +27,16 @@ export default function App() {
   };
 
   const [isGalleryRoute, setIsGalleryRoute] = useState<boolean>(getIsGalleryRoute);
-  const [isPresentationRoute, setIsPresentationRoute] = useState<boolean>(() => window.location.pathname.replace(/\\/$/, '') === '/presentation');
+  const [isPresentationRoute, setIsPresentationRoute] = useState<boolean>(() => window.location.pathname.replace(/\/$/, '') === '/presentation');
 
   useEffect(() => {
-    if (window.location.pathname.replace(/\\/$/, '') === '/presentation') {
+    if (window.location.pathname.replace(/\/$/, '') === '/presentation') {
       window.history.replaceState({ ...window.history.state, presentationRoute: true }, '');
     }
-    const handleRouteChange = () => setIsPresentationRoute(window.location.pathname.replace(/\\/$/, '') === '/presentation');
+    const handleRouteChange = () => setIsPresentationRoute(window.location.pathname.replace(/\/$/, '') === '/presentation');
     window.addEventListener('popstate', handleRouteChange);
     return () => window.removeEventListener('popstate', handleRouteChange);
   }, []);
-
-  if (isPresentationRoute) return <Presentation />;
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -79,6 +77,8 @@ export default function App() {
       window.location.hash = '#gallery';
     }
   }, []);
+
+  if (isPresentationRoute) return <Presentation />;
 
   return (
     <ImageViewerProvider>
